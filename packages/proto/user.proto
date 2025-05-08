@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "packages/proto/build";
+
+message User{
+   string id = 1;
+   string fullname = 2;
+   string phoneNumber = 3;
+}
+
+service UserService{
+    rpc RegisterNewUser(User) returns(User);
+}
