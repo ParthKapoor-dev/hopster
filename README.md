@@ -1,84 +1,127 @@
-# Turborepo starter
+# 🚗 Hopster - A Ride Sharing System (WIP)
 
-This Turborepo starter is maintained by the Turborepo core team.
+Hopster is a modular, scalable, and microservice-based ride-sharing backend system written in **Go** using **gRPC**, designed to handle real-world challenges of user onboarding, driver management, and trip coordination.
 
-## Using this example
+> 🔧 Currently in development – built with clean architecture principles, type-safe protobufs, and structured monorepo tooling.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## 📐 Architecture
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+Hopster is structured into 3 main services + 1 gateway:
 
 ```
-cd my-turborepo
-pnpm build
+
+apps/
+├── user      --> Manages user registration & login
+├── driver    --> Handles driver profile & availability
+├── trip      --> Coordinates ride creation & status
+├── gateway   --> HTTP interface for frontend, routes to internal gRPC services
+packages/
+└── proto     --> Shared protobuf definitions and generated Go code
+
+````
+
+Each service exposes a **gRPC interface**, and the gateway handles **HTTP requests** and converts them into internal gRPC calls.
+
+---
+
+## ⚙️ Tech Stack
+
+- 🧠 **Golang** – Modern, fast, strongly typed backend
+- 🔌 **gRPC** – Internal service communication
+- 📦 **Protocol Buffers** – Schema definition & code generation
+- 🛠️ **Monorepo** – Centralized using native Go tooling
+- 📁 **Modular Clients** – Each service has a gRPC client abstraction
+- 🧪 **Testable Design** – Handler abstractions for easier mocking
+
+---
+
+## 🚀 Getting Started
+
+### ✅ Prerequisites
+- Go 1.21+
+- Protobuf compiler (`protoc`)
+- `protoc-gen-go` and `protoc-gen-go-grpc`
+
+```bash
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+````
+
+### 📦 Clone and setup
+
+```bash
+git clone https://github.com/parthkapoor-dev/hopster
+cd hopster
+
+# Initialize and download Go modules
+go mod tidy
 ```
 
-### Develop
+### 🔧 Build Protobufs
 
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm dev
+```bash
+protoc --go_out=packages/proto/build --go-grpc_out=packages/proto/build \
+  --proto_path=packages/proto packages/proto/*.proto
 ```
 
-### Remote Caching
+### 🏁 Run services
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+#### 1. Start the **User Service**
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```bash
+cd apps/user
+go run main.go
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+#### 2. Start the **Gateway**
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+```bash
+cd apps/gateway
+go run main.go
+```
+
+> Services listen on ports like `:2000`, and Gateway on `:3000` by default.
+
+---
+
+## 📨 API Flow Example
 
 ```
-npx turbo link
+Frontend  -->  Gateway (HTTP)  -->  gRPC (User Service)
+POST /users/register           -->  RegisterNewUser(ctx, pb.User)
 ```
 
-## Useful Links
+The gateway translates HTTP requests into protobufs, calls the gRPC method, and responds to the client.
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 🛠️ Roadmap
+
+* [x] gRPC Setup with Gateway
+* [x] User Service Skeleton
+* [ ] Implement User Registration Logic (DB)
+* [ ] Add Driver Service
+* [ ] Add Trip Service
+* [ ] Authentication & Middleware
+* [ ] Docker Compose + Dev tooling
+
+---
+
+## 🤝 Contribution
+
+Pull requests and issues are welcome. Let’s build something scalable and elegant!
+
+---
+
+## 🧑‍💻 Author
+
+**Parth Kapoor**
+[🌐 Portfolio](https://parthkapoor.me) | [🔗 LinkedIn](https://linkedin.com/in/parthkapoor08) | [📂 GitHub](https://github.com/parthkapoor-dev)
+
+---
+
+## 📄 License
+
+MIT License
