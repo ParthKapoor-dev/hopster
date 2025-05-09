@@ -10,15 +10,18 @@ import (
 
 type grpcHandler struct {
 	pb.UnimplementedUserServiceServer
+	service *UserService
 }
 
-func NewGrpcHandler(grpcServer *grpc.Server) {
-	handler := &grpcHandler{}
+func NewGrpcHandler(grpcServer *grpc.Server, service *UserService) {
+	handler := &grpcHandler{
+		service: service,
+	}
 	pb.RegisterUserServiceServer(grpcServer, handler)
 }
 
 func (h *grpcHandler) RegisterNewUser(ctx context.Context, p *pb.NewUserRequest) (*pb.User, error) {
-
-	log.Println("Received RegisterNewUser @GRPC ")
-	return &pb.User{}, nil
+	log.Println("Received RegisterNewUser @GRPC ", p)
+	user, err := h.service.CreateNewUser(p)
+	return user, err
 }

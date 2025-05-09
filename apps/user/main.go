@@ -21,7 +21,8 @@ func main() {
 	}
 	defer l.Close()
 
-	NewGrpcHandler(grpcServer)
+	svc := NewUserService()
+	NewGrpcHandler(grpcServer, svc)
 
 	log.Println("Started Listening at", grpcAddr)
 	if err := grpcServer.Serve(l); err != nil {
