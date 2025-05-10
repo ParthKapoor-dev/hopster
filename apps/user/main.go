@@ -4,11 +4,13 @@ import (
 	"log"
 	"net"
 
+	db "github.com/parthkapoor-dev/user/store"
 	"google.golang.org/grpc"
 )
 
 var (
 	grpcAddr = "localhost:2000"
+	mongoURI = "mongodb://localhost:27017"
 )
 
 func main() {
@@ -21,8 +23,8 @@ func main() {
 	}
 	defer l.Close()
 
-	svc := NewUserService()
-	NewGrpcHandler(grpcServer, svc)
+	store := db.NewStore(mongoURI, "hopster", "users")
+	NewGrpcHandler(grpcServer, store)
 
 	log.Println("Started Listening at", grpcAddr)
 	if err := grpcServer.Serve(l); err != nil {
