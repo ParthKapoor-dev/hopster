@@ -11,10 +11,22 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.6",
+    "@radix-ui/react-slot": "^1.2.2",
+    "@radix-ui/react-switch": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.11",
     "@repo/ui": "*",
+    "@tailwindcss/postcss": "^4.1.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.509.0",
     "next": "^15.3.0",
+    "next-themes": "^0.4.6",
+    "postcss": "^8.5.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss": "^4.1.6"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
@@ -23,6 +35,7 @@
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
     "eslint": "^9.26.0",
+    "tw-animate-css": "^1.2.9",
     "typescript": "5.8.2"
   }
 }
