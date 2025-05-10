@@ -13,10 +13,15 @@ message User{
 
 service UserService{
     rpc RegisterNewUser(NewUserRequest) returns(User);
+    rpc AuthenticateUser(UserEmail) returns (User);
 }
 
 message NewUserRequest{
     string fullname = 1;
     string phoneNumber = 2;
     string email = 3;
+}
+
+message UserEmail{
+    string email = 1;
 }

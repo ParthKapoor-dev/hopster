@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	httpAddr = ":3000"
+	httpAddr = ":8080"
 )
 
 func main() {
@@ -23,6 +23,8 @@ func main() {
 	handler := http_handler.NewHttpHandler(user.Client)
 	handler.RegisterRoutes(mux)
 
-	log.Println("Gateway running on :3000")
-	log.Fatal(http.ListenAndServe(httpAddr, mux))
+	wrappedMux := corsMiddleware(mux)
+
+	log.Println("Gateway running on", httpAddr)
+	log.Fatal(http.ListenAndServe(httpAddr, wrappedMux))
 }

@@ -33,6 +33,21 @@ func (h *HttpHandler) handleRegisterUser(w http.ResponseWriter, r *http.Request)
 	json.WriteJSON(w, http.StatusOK, user)
 }
 
+func (h *HttpHandler) handlerLoginUser(w http.ResponseWriter, r *http.Request) {
+
+	email := r.PathValue("email")
+
+	user, err := h.userClient.AuthenticateUser(context.Background(), &pb.UserEmail{
+		Email: email,
+	})
+	if err != nil {
+		json.WriteError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	json.WriteJSON(w, http.StatusOK, user)
+}
+
 func ValidateNewUserRequest(req *pb.NewUserRequest) error {
 	if req.Fullname == "" {
 		return errors.New("Missing: User's Full Name is Required")

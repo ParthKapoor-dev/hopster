@@ -14,6 +14,7 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
+      "env": ["BACKEND_URL"],
       "cache": false,
       "persistent": true
     }

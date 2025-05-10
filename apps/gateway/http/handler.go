@@ -19,5 +19,6 @@ func NewHttpHandler(userClient pb.UserServiceClient) HttpHandler {
 func (h *HttpHandler) RegisterRoutes(mux *http.ServeMux) {
 
 	// User Routes
-	mux.HandleFunc("POST /users", h.handleRegisterUser)
+	mux.HandleFunc("POST /users/register", h.handleRegisterUser)
+	mux.HandleFunc("GET /users/login/{email}", h.handlerLoginUser)
 }

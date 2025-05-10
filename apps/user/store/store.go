@@ -8,12 +8,17 @@ import (
 	db "github.com/parthkapoor-dev/hopster/packages/mongodb"
 	pb "github.com/parthkapoor-dev/hopster/packages/proto/build"
 	"github.com/parthkapoor-dev/user/store/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const (
+	colName = "users"
+	dbName  = "hopster"
+)
+
 type UserStore struct {
-	Collection *mongo.Collection
+	db *mongo.Client
 }
 
 func NewStore(uri string, dbName string, collectionName string) *UserStore {
@@ -24,27 +29,33 @@ func NewStore(uri string, dbName string, collectionName string) *UserStore {
 		return nil
 	}
 	return &UserStore{
-		Collection: mongoClient.Database(dbName).Collection(collectionName),
+		db: mongoClient,
 	}
 }
 
-func (s *UserStore) CreateNewUser(ctx context.Context, p *pb.NewUserRequest) (*pb.User, error) {
+func (s *UserStore) CreateNewUser(ctx context.Context, p *pb.NewUserRequest) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	res, err := s.Collection.InsertOne(ctx, &models.User{
+	col := s.db.Database(dbName).Collection(colName)
+
+	return col.InsertOne(ctx, &models.User{
 		Fullname:    p.Fullname,
 		Email:       p.Email,
 		PhoneNumber: p.PhoneNumber,
 	})
-	if err != nil {
-		return nil, err
-	}
+}
 
-	return &pb.User{
-		Id:          res.InsertedID.(primitive.ObjectID).Hex(),
-		Fullname:    p.Fullname,
-		PhoneNumber: p.PhoneNumber,
-		Email:       p.Email,
-	}, nil
+func (s *UserStore) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	col := s.db.Database(dbName).Collection(colName)
+
+	var user *models.User
+	err := col.FindOne(ctx, bson.M{
+		"email": email,
+	}).Decode(&user)
+
+	return user, err
 }

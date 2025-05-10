@@ -22,7 +22,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { authClient } from "@/app/api/auth/[[...auth]]/route";
+import AuthLogin from "@/actions/auth/login";
+import AuthSignup from "@/actions/auth/signup";
 
 export default function AuthPage() {
   // Login form state
@@ -52,16 +53,8 @@ export default function AuthPage() {
     }
 
     try {
-      console.log("trying it out");
-      const { data, error } = await authClient.signIn.magicLink({
-        email: loginEmail,
-        callbackURL: "/",
-      });
-
-      if (error) throw new Error(error.message);
-
-      console.log("Data received", data);
-      console.log("error", error);
+      const response = await AuthLogin(loginEmail);
+      console.log(response);
 
       // Show success message
       setLoginSuccess(true);
@@ -101,16 +94,8 @@ export default function AuthPage() {
     }
 
     try {
-      console.log("trying it out");
-      const { data, error } = await authClient.signIn.magicLink({
-        email: signupEmail,
-        callbackURL: "/",
-      });
-
-      if (error) throw new Error(error.message);
-
-      console.log("Data received", data);
-      console.log("error", error);
+      const response = await AuthSignup(signupEmail, fullName, phoneNumber);
+      console.log(response);
 
       // Show success message
       setSignupSuccess(true);
@@ -148,7 +133,7 @@ export default function AuthPage() {
               <CardContent className="space-y-4">
                 {loginSuccess ? (
                   <Alert className="bg-green-50 border-green-200">
-                    <Mail className="h-4 w-4 text-green-500" />
+                    <Mail className="h-4 w-4 text-green-500" color="green" />
                     <AlertDescription className="text-green-700">
                       Magic link sent! Check your email to log in.
                     </AlertDescription>
@@ -219,8 +204,8 @@ export default function AuthPage() {
 
               <CardContent className="space-y-4">
                 {signupSuccess ? (
-                  <Alert className="bg-green-50 border-green-200">
-                    <Mail className="h-4 w-4 text-green-500" />
+                  <Alert className="bg-green-200 border-green-200">
+                    <Mail className="h-4 w-4 text-green-500" color="green" />
                     <AlertDescription className="text-green-700">
                       Account created! Check your email to complete the
                       registration.
