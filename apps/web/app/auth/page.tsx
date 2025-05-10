@@ -22,6 +22,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { authClient } from "@/app/api/auth/[[...auth]]/route";
 
 export default function AuthPage() {
   // Login form state
@@ -51,8 +52,16 @@ export default function AuthPage() {
     }
 
     try {
-      // Simulate API call for sending magic link
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("trying it out");
+      const { data, error } = await authClient.signIn.magicLink({
+        email: loginEmail,
+        callbackURL: "/",
+      });
+
+      if (error) throw new Error(error.message);
+
+      console.log("Data received", data);
+      console.log("error", error);
 
       // Show success message
       setLoginSuccess(true);
@@ -61,6 +70,7 @@ export default function AuthPage() {
       setLoginEmail("");
     } catch (error) {
       setLoginError("Failed to send magic link. Please try again.");
+      console.log(error);
     } finally {
       setLoginSubmitting(false);
     }
@@ -91,8 +101,16 @@ export default function AuthPage() {
     }
 
     try {
-      // Simulate API call for user registration
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("trying it out");
+      const { data, error } = await authClient.signIn.magicLink({
+        email: signupEmail,
+        callbackURL: "/",
+      });
+
+      if (error) throw new Error(error.message);
+
+      console.log("Data received", data);
+      console.log("error", error);
 
       // Show success message
       setSignupSuccess(true);
@@ -103,6 +121,7 @@ export default function AuthPage() {
       setPhoneNumber("");
     } catch (error) {
       setSignupError("Registration failed. Please try again.");
+      console.log(error);
     } finally {
       setSignupSubmitting(false);
     }

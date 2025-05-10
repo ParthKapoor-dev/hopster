@@ -8,6 +8,7 @@ message User{
    string id = 1;
    string fullname = 2;
    string phoneNumber = 3;
+   string email = 4;
 }
 
 service UserService{
@@ -17,4 +18,5 @@ service UserService{
 message NewUserRequest{
     string fullname = 1;
     string phoneNumber = 2;
+    string email = 3;
 }

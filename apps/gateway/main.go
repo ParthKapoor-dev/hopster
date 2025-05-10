@@ -5,8 +5,11 @@ import (
 	"net/http"
 
 	userClient "github.com/parthkapoor-dev/gateway/grpc_clients/user_client"
-
 	http_handler "github.com/parthkapoor-dev/gateway/http"
+)
+
+var (
+	httpAddr = ":3000"
 )
 
 func main() {
@@ -21,5 +24,5 @@ func main() {
 	handler.RegisterRoutes(mux)
 
 	log.Println("Gateway running on :3000")
-	log.Fatal(http.ListenAndServe(":3000", mux))
+	log.Fatal(http.ListenAndServe(httpAddr, mux))
 }

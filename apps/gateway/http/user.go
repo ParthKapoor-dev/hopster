@@ -42,5 +42,9 @@ func ValidateNewUserRequest(req *pb.NewUserRequest) error {
 		return errors.New("Missing: User's Phone Number is Required")
 	}
 
+	if req.Email == "" {
+		return errors.New("Missing: User's Email is required")
+	}
+
 	return nil
 }

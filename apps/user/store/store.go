@@ -34,6 +34,7 @@ func (s *UserStore) CreateNewUser(ctx context.Context, p *pb.NewUserRequest) (*p
 
 	res, err := s.Collection.InsertOne(ctx, &models.User{
 		Fullname:    p.Fullname,
+		Email:       p.Email,
 		PhoneNumber: p.PhoneNumber,
 	})
 	if err != nil {
@@ -44,5 +45,6 @@ func (s *UserStore) CreateNewUser(ctx context.Context, p *pb.NewUserRequest) (*p
 		Id:          res.InsertedID.(primitive.ObjectID).Hex(),
 		Fullname:    p.Fullname,
 		PhoneNumber: p.PhoneNumber,
+		Email:       p.Email,
 	}, nil
 }
