@@ -85,9 +85,20 @@ func (h *grpcHandler) AuthenticateUser(ctx context.Context, p *pb.UserEmail) (*p
 	}, nil
 }
 
-func (h *grpcHandler) VerifyToken(ctx context.Context, p *pb.AuthToken) (*pb.User, error) {
+func (h *grpcHandler) VerifyToken(ctx context.Context, p *pb.UserEmail) (*pb.User, error) {
 
-	log.Println("Auth Token: ", p.Token)
+	user, err := h.store.GetUserByEmail(ctx, p.Email)
+	if err == mongo.ErrNoDocuments {
+		return nil, errors.New("This Email Account does not exists")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := jwt.GenToken(p.Email, time.Now().Add(time.Minute*10).Unix())
+	if err != nil {
+		return nil, err
+	}
 
 	return &pb.User{
 		Id: "1",

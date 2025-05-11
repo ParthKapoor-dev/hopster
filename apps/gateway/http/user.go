@@ -54,10 +54,8 @@ func (h *HttpHandler) handleValidateToken(w http.ResponseWriter, r *http.Request
 
 	user := middleware.GetAuthenticatedUserEmail(r)
 
-	log.Println("Inside the gateway/handler", user)
-
-	item, err := h.userClient.VerifyToken(context.Background(), &pb.AuthToken{
-		Token: user,
+	item, err := h.userClient.VerifyToken(context.Background(), &pb.UserEmail{
+		Email: user,
 	})
 	if err != nil {
 		log.Fatal("Error::", err)
