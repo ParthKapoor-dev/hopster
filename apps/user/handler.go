@@ -5,15 +5,23 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/parthkapoor-dev/hopster/packages/dotenv"
 	"github.com/parthkapoor-dev/hopster/packages/gomail"
+	"github.com/parthkapoor-dev/hopster/packages/jwt"
 	pb "github.com/parthkapoor-dev/hopster/packages/proto/build"
 	db "github.com/parthkapoor-dev/user/store"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
+)
+
+var (
+	sender  = dotenv.EnvString("GMAIL_USER", "")
+	pass    = dotenv.EnvString("GMAIL_PASSWORD", "")
+	nextURL = dotenv.EnvString("NEXT_URL", "http://localhost:3000")
 )
 
 type grpcHandler struct {
@@ -40,12 +48,18 @@ func (h *grpcHandler) RegisterNewUser(ctx context.Context, p *pb.NewUserRequest)
 		return nil, err
 	}
 
-	return &pb.User{
+	if err := sendMagicLink(p.Email); err != nil {
+		return nil, err
+	}
+
+	user := &pb.User{
 		Id:          res.InsertedID.(primitive.ObjectID).Hex(),
 		Fullname:    p.Fullname,
 		PhoneNumber: p.PhoneNumber,
 		Email:       p.Email,
-	}, nil
+	}
+
+	return user, nil
 }
 
 func (h *grpcHandler) AuthenticateUser(ctx context.Context, p *pb.UserEmail) (*pb.User, error) {
@@ -59,15 +73,7 @@ func (h *grpcHandler) AuthenticateUser(ctx context.Context, p *pb.UserEmail) (*p
 		return nil, err
 	}
 
-	token := "1234"
-	link := fmt.Sprintf("http://localhost:3000/magic-login?token=%s", token)
-	body := fmt.Sprintf("Click <a href='%s'>here</a> to log in", link)
-
-	sender := dotenv.EnvString("GMAIL_USER", "")
-	pass := dotenv.EnvString("GMAIL_PASSWORD", "")
-
-	if err := gomail.SendMagicLinkEmail(p.Email, body, sender, pass); err != nil {
-		log.Fatal(err)
+	if err := sendMagicLink(p.Email); err != nil {
 		return nil, err
 	}
 
@@ -77,4 +83,30 @@ func (h *grpcHandler) AuthenticateUser(ctx context.Context, p *pb.UserEmail) (*p
 		Fullname:    user.Fullname,
 		PhoneNumber: user.PhoneNumber,
 	}, nil
+}
+
+func (h *grpcHandler) VerifyToken(ctx context.Context, p *pb.AuthToken) (*pb.User, error) {
+
+	log.Println("Auth Token: ", p.Token)
+
+	return &pb.User{
+		Id: "1",
+	}, nil
+}
+
+func sendMagicLink(email string) error {
+
+	token, err := jwt.GenToken(email, time.Now().Add(time.Minute*10).Unix())
+	if err != nil {
+		return err
+	}
+	link := fmt.Sprintf(nextURL+"/auth/verify?token=%s", token)
+	body := fmt.Sprintf("Click <a href='%s'>here</a> to log in", link)
+
+	if err := gomail.SendMagicLinkEmail(email, body, sender, pass); err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	return nil
 }

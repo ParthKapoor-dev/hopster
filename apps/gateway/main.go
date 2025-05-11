@@ -6,6 +6,7 @@ import (
 
 	userClient "github.com/parthkapoor-dev/gateway/grpc_clients/user_client"
 	http_handler "github.com/parthkapoor-dev/gateway/http"
+	mid "github.com/parthkapoor-dev/gateway/middleware"
 )
 
 var (
@@ -23,7 +24,7 @@ func main() {
 	handler := http_handler.NewHttpHandler(user.Client)
 	handler.RegisterRoutes(mux)
 
-	wrappedMux := corsMiddleware(mux)
+	wrappedMux := mid.CorsMiddleware(mux)
 
 	log.Println("Gateway running on", httpAddr)
 	log.Fatal(http.ListenAndServe(httpAddr, wrappedMux))

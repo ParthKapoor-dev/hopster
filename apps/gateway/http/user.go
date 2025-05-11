@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/parthkapoor-dev/gateway/middleware"
 	json "github.com/parthkapoor-dev/hopster/packages/json"
 	pb "github.com/parthkapoor-dev/hopster/packages/proto/build"
 )
@@ -46,6 +48,25 @@ func (h *HttpHandler) handlerLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.WriteJSON(w, http.StatusOK, user)
+}
+
+func (h *HttpHandler) handleValidateToken(w http.ResponseWriter, r *http.Request) {
+
+	user := middleware.GetAuthenticatedUserEmail(r)
+
+	log.Println("Inside the gateway/handler", user)
+
+	item, err := h.userClient.VerifyToken(context.Background(), &pb.AuthToken{
+		Token: user,
+	})
+	if err != nil {
+		log.Fatal("Error::", err)
+		json.WriteError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	json.WriteJSON(w, http.StatusOK, item)
+
 }
 
 func ValidateNewUserRequest(req *pb.NewUserRequest) error {
