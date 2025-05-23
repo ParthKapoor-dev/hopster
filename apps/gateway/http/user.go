@@ -52,10 +52,10 @@ func (h *HttpHandler) handlerLoginUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *HttpHandler) handleValidateToken(w http.ResponseWriter, r *http.Request) {
 
-	user := middleware.GetAuthenticatedUserEmail(r)
+	userEmail := middleware.GetAuthenticatedUserEmail(r)
 
-	item, err := h.userClient.VerifyToken(context.Background(), &pb.UserEmail{
-		Email: user,
+	token, err := h.userClient.VerifyToken(context.Background(), &pb.UserEmail{
+		Email: userEmail,
 	})
 	if err != nil {
 		log.Fatal("Error::", err)
@@ -63,8 +63,17 @@ func (h *HttpHandler) handleValidateToken(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	json.WriteJSON(w, http.StatusOK, item)
+	json.WriteJSON(w, http.StatusOK, token)
 
+}
+
+func (h *HttpHandler) handleGetPage(w http.ResponseWriter, r *http.Request) {
+
+	userEmail := middleware.GetAuthenticatedUserEmail(r)
+
+	fmt.Println(userEmail)
+
+	json.WriteJSON(w, http.StatusOK, userEmail)
 }
 
 func ValidateNewUserRequest(req *pb.NewUserRequest) error {

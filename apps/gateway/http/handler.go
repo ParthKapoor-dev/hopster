@@ -25,4 +25,5 @@ func (h *HttpHandler) RegisterRoutes(mux *http.ServeMux) {
 
 	// User Protected Routes
 	mux.HandleFunc("GET /users/verify", mid.UserAuthMiddleware(h.handleValidateToken))
+	mux.HandleFunc("GET /users", mid.CookieAuthMiddleware(h.handleGetPage))
 }

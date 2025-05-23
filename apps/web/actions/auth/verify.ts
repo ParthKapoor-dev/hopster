@@ -1,6 +1,9 @@
+"use server";
+
+import { setCookie } from "@/lib/cookies";
 import axios from "axios";
 
-export default async function TokenVerification(email: string, token: string) {
+export default async function TokenVerification(token: string) {
   try {
     const url = process.env.NEXT_PUBLIC_BACKEND_URL + "/users/verify";
 
@@ -10,6 +13,11 @@ export default async function TokenVerification(email: string, token: string) {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.status == 200) {
+      await setCookie("authToken", response.data.token);
+    }
+
     console.log(response);
   } catch (error) {
     console.error(error);

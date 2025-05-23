@@ -14,7 +14,7 @@ message User{
 service UserService{
     rpc RegisterNewUser(NewUserRequest) returns(User);
     rpc AuthenticateUser(UserEmail) returns (User);
-    rpc VerifyToken(UserEmail) returns (User);
+    rpc VerifyToken(UserEmail) returns (AuthToken);
 }
 
 message NewUserRequest{
@@ -25,4 +25,8 @@ message NewUserRequest{
 
 message UserEmail{
     string email = 1;
+}
+
+message AuthToken{
+    string token = 1;
 }

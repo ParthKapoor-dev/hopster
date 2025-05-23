@@ -60,6 +60,38 @@ func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
+func CookieAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		log.Println("Running Cookies Middleware")
+
+		tokenCookie, err := r.Cookie("authToken")
+		all := r.Cookies()
+		log.Println(all)
+		if err != nil {
+			json.WriteError(w, http.StatusUnauthorized, "Missing Auth Cookie")
+			return
+		}
+
+		claims, err := jwt.ValidateToken(tokenCookie.Value)
+		if err != nil {
+			log.Println("Token Validation Failed:", err)
+			json.WriteError(w, http.StatusUnauthorized, "Invalid or Expired Token")
+			return
+		}
+
+		// assuming claims is a map[string]interface{}
+		email, ok := claims["email"].(string)
+		if !ok {
+			json.WriteError(w, http.StatusUnauthorized, "Invalid Token Payload")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), userContextKey, email)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	}
+}
+
 func GetAuthenticatedUserEmail(r *http.Request) string {
 	email, _ := r.Context().Value(userContextKey).(string)
 	return email

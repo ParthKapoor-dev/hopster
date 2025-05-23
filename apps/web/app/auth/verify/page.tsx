@@ -1,18 +1,23 @@
 "use client";
 
 import TokenVerification from "@/actions/auth/verify";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function VerifyTokenPage() {
   const searchParams = useSearchParams();
-
   const token = searchParams.get("token");
-  const email = searchParams.get("email");
+
+  const router = useRouter();
 
   useEffect(() => {
     async function verify() {
-      await TokenVerification(email!, token!);
+      try {
+        await TokenVerification(token!);
+        router.push("/dashboard");
+      } catch (err) {
+        console.log(err);
+      }
     }
     verify();
   });
