@@ -54,7 +54,7 @@ func (h *HttpHandler) handleValidateToken(w http.ResponseWriter, r *http.Request
 
 	userEmail := middleware.GetAuthenticatedUserEmail(r)
 
-	token, err := h.userClient.VerifyToken(context.Background(), &pb.UserEmail{
+	result, err := h.userClient.VerifyToken(context.Background(), &pb.UserEmail{
 		Email: userEmail,
 	})
 	if err != nil {
@@ -63,7 +63,17 @@ func (h *HttpHandler) handleValidateToken(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	json.WriteJSON(w, http.StatusOK, token)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "authToken",
+		Value:    result.Token,
+		Path:     "/", // ✅ valid path
+		HttpOnly: true,
+		Secure:   false,                // ✅ OK for localhost, should be true in prod
+		SameSite: http.SameSiteLaxMode, // ✅ or `SameSiteDefaultMode`
+		MaxAge:   3600 * 24,
+	})
+
+	json.WriteJSON(w, http.StatusOK, map[string]string{"token": result.Token})
 
 }
 

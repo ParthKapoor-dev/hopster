@@ -1,6 +1,3 @@
-"use server";
-
-import { setCookie } from "@/lib/cookies";
 import axios from "axios";
 
 export default async function TokenVerification(token: string) {
@@ -12,11 +9,8 @@ export default async function TokenVerification(token: string) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      withCredentials: true,
     });
-
-    if (response.status == 200) {
-      await setCookie("authToken", response.data.token);
-    }
 
     console.log(response);
   } catch (error) {

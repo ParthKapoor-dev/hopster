@@ -66,9 +66,8 @@ func CookieAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		log.Println("Running Cookies Middleware")
 
 		tokenCookie, err := r.Cookie("authToken")
-		all := r.Cookies()
-		log.Println(all)
 		if err != nil {
+			log.Println(r.Cookies())
 			json.WriteError(w, http.StatusUnauthorized, "Missing Auth Cookie")
 			return
 		}

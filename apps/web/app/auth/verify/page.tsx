@@ -16,7 +16,7 @@ export default function VerifyTokenPage() {
         await TokenVerification(token!);
         router.push("/dashboard");
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
     verify();
